@@ -28,13 +28,10 @@ class Encryptor {
 
   generateRandomIVHex(): string {
     if (typeof window !== 'undefined' && window.crypto) {
-      // ブラウザ環境
       const array = new Uint8Array(16);
       window.crypto.getRandomValues(array);
       return Array.from(array).map(byte => byte.toString(16).padStart(2, '0')).join('');
     } else {
-      // Node.js環境
-      const {randomBytes} = require('crypto');
       const iv = randomBytes(16);
       return iv.toString('hex');
     }
