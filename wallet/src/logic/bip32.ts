@@ -1,17 +1,13 @@
-import * as ecc from 'tiny-secp256k1';
-import * as crypto from 'crypto';
-import BIP32Factory, { BIP32API } from 'bip32';
+import * as bip39 from "bip39";
 
 class Bip32 {
-  bip32: BIP32API
-  constructor() {
-    this.bip32 = BIP32Factory(ecc);
+  createEntropy() {
+    const mnemonic = bip39.generateMnemonic();
+    return bip39.mnemonicToEntropy(mnemonic);
   }
-  create() {
-    const seed = crypto.randomBytes(32);
-    const root = this.bip32.fromSeed(seed);
-    return root.toBase58()
+
+  entropyToMnemonic(entropy: string) {
+    return bip39.entropyToMnemonic(entropy);
   }
 }
-
-export default new Bip32();
+export const bip32 =  new Bip32();

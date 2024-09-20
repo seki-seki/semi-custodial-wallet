@@ -22,21 +22,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const ecc = __importStar(require("tiny-secp256k1"));
-const crypto = __importStar(require("crypto"));
-const bip32_1 = __importDefault(require("bip32"));
+const bip39 = __importStar(require("bip39"));
 class Bip32 {
-    constructor() {
-        this.bip32 = (0, bip32_1.default)(ecc);
+    createEntropy() {
+        const mnemonic = bip39.generateMnemonic();
+        return bip39.mnemonicToEntropy(mnemonic);
     }
-    create() {
-        const seed = crypto.randomBytes(32);
-        const root = this.bip32.fromSeed(seed);
-        return root.toBase58();
+    entropyToMnemonic(entropy) {
+        return bip39.entropyToMnemonic(entropy);
     }
 }
 exports.default = new Bip32();
+//# sourceMappingURL=bip32.js.map
