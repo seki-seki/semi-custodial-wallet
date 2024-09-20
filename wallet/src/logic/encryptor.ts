@@ -1,4 +1,3 @@
-import { randomBytes } from "crypto";
 import CryptoJS from "crypto-js";
 import * as uuid from "uuid";
 
@@ -32,6 +31,7 @@ class Encryptor {
       window.crypto.getRandomValues(array);
       return Array.from(array).map(byte => byte.toString(16).padStart(2, '0')).join('');
     } else {
+      const {randomBytes} = require('crypto');
       const iv = randomBytes(16);
       return iv.toString('hex');
     }
