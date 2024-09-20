@@ -33,8 +33,21 @@ function App() {
           Learn React
         </a>
       </header>
+      <LoginButton/>
     </div>
   );
 }
 
+const LoginButton = () => {
+  const handleLogin = () => {
+    // CognitoのホストされたUIにリダイレクト
+    window.location.href = 'https://fides-samile.auth.ap-northeast-1.amazoncognito.com/oauth2/authorize?client_id=2hippmrs2hj7cif1fm96os27gu&response_type=code&scope=openid&redirect_uri=http%3A%2F%2Flocalhost%3A3000';
+  };
+
+  return (
+    <button onClick={handleLogin}>
+      Login with Cognito
+    </button>
+  );
+};
 export default App;
