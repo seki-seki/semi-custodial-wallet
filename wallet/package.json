@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@types/tiny-secp256k1": "^2.0.1",
+    "aws-amplify": "^6.6.2",
+    "aws-sdk": "^2.1691.0",
     "bip32": "^5.0.0-rc.0",
     "bip39": "^3.1.0",
     "crypto-js": "^4.2.0",
