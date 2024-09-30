@@ -1,5 +1,5 @@
 import { Amplify } from 'aws-amplify';
-import { signInWithRedirect, SignInWithRedirectInput, fetchAuthSession } from 'aws-amplify/auth';
+import { signInWithRedirect, SignInWithRedirectInput, fetchAuthSession, signOut } from 'aws-amplify/auth';
 import { uploadData } from 'aws-amplify/storage';
 import AWS from 'aws-sdk'
 export class AmplifyWrrapper {
@@ -14,6 +14,10 @@ export class AmplifyWrrapper {
     } catch (error) {
       console.error('Error signing in with Google:', error);
     }
+  }
+
+  async signOut() {
+    await signOut();
   }
 
   async getSession() {
