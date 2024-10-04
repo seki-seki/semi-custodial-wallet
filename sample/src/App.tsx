@@ -76,7 +76,13 @@ function App() {
       ],
       key: decKey
     })
+    console.log("recover from remote")
     console.log(entropy)
+    const fromLocal = wallet.getEntoropyFromLocal({
+      key: decKey
+    })
+    console.log("recover from local")
+    console.log(fromLocal)
   }, [wallet, decKey])
 
 

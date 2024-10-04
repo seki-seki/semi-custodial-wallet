@@ -75,7 +75,7 @@ export class SemiCustodialWallet {
     return splitEntropy.join("")
   }
 
-  async getEntoropyFromLocal(param: GetEntoropyFromLocalParam) {
+  getEntoropyFromLocal(param: GetEntoropyFromLocalParam) {
     const {localStorageKey, key} = param;
     const encEntropy = localStorage.getItem(localStorageKey || LOCAL_STORAGE_KEY);
     if (!encEntropy) throw "not found"
