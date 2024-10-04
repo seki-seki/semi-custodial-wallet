@@ -1,7 +1,7 @@
 import { AmplifyWrrapper } from "../auth";
 import { bip32, encryptor, splitter } from "../logic";
 
-export type Distination = {
+export type Destination = {
   region: string;
   bucket: string;
   fileName: string;
@@ -9,13 +9,13 @@ export type Distination = {
 
 export type CreateParam = {
   key: string;
-  distinations: Distination[];
+  destinations: Destination[];
   localStorageKey?: string;
 }
 
 export type GetEntoropyFromRemoteParam = {
   key: string;
-  distinations: Distination[];
+  destinations: Destination[];
 }
 
 export type GetEntoropyFromLocalParam = {
@@ -51,28 +51,28 @@ export class SemiCustodialWallet {
 
   async create(param: CreateParam) {
     if (!this.isSignIn()) throw ("sign in first");
-    const {distinations, key, localStorageKey} = param;
+    const {destinations, key, localStorageKey} = param;
     const entropy = bip32.createEntropy();
-    const splitEntropy = splitter.split(entropy, distinations.length);
+    const splitEntropy = splitter.split(entropy, destinations.length);
     const encrypted = await Promise.all(
       splitEntropy.map(async (part: string, i: number) => {
         const cipher = encryptor.encryptWithRandomIv(part, key);
-        console.log(`upload to ${distinations[i].bucket}`)
-        return () => this.amplifyWrrapper.upload(distinations[i].region, distinations[i].bucket, distinations[i].fileName, cipher);
+        return this.amplifyWrrapper.upload(destinations[i].region, destinations[i].bucket, destinations[i].fileName, cipher);
       }))
     const encEntropy = encryptor.encryptWithRandomIv(entropy, key)
     localStorage.setItem(localStorageKey || LOCAL_STORAGE_KEY, encEntropy)
-    return encEntropy;
+    return [entropy, encEntropy];
   }
 
   async getEntoropyFromRemote(param: GetEntoropyFromRemoteParam) {
     if (!this.isSignIn()) throw ("sign in first");
-    const {distinations, key} = param;
+    const {destinations, key} = param;
     const splitEntropy = await Promise.all(
-      distinations.map((distination: Distination) => {
-        return () => this.amplifyWrrapper.get(distination.region, distination.bucket, distination.fileName);
+      destinations.map(async (Destination: Destination) => {
+        const encPart = await this.amplifyWrrapper.get(Destination.region, Destination.bucket, Destination.fileName);
+        return encryptor.decryptWithLastIv(encPart, key);
       }))
-    return encryptor.decryptWithLastIv(splitEntropy.join(""), key);
+    return splitEntropy.join("")
   }
 
   async getEntoropyFromLocal(param: GetEntoropyFromLocalParam) {

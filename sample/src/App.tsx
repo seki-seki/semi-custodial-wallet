@@ -7,7 +7,9 @@ import config from "./aws-exports";
 function App() {
   const [wallet, setWallet] = useState<SemiCustodialWallet>()
   const [isSignIn, setIsSignIn] = useState<boolean>();
-  const [key, setKey] = useState<string>("");
+  const [encKey, setEncKey] = useState<string>("");
+  const [decKey, setDecKey] = useState<string>("");
+
   useEffect(() => {
     const setup = async () => {
       const wallet = new SemiCustodialWallet(config);
@@ -27,14 +29,18 @@ function App() {
     setIsSignIn(false);
   }, [wallet]);
 
-  const handleChangeKey = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setKey(e.target.value)
-  },[])
-  const handleCreateWithPassword = useCallback(async() => {
+  const handleChangeEncKey = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setEncKey(e.target.value)
+  }, [])
+  const handleChangDecKey = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setDecKey(e.target.value)
+  }, [])
+
+  const handleCreateWithPassword = useCallback(async () => {
     if (!wallet) throw "no wallet";
-    if(!key) throw "no key";
-    await wallet.create({
-      distinations: [
+    if (!encKey) throw "no key";
+    const [entropy] = await wallet.create({
+      destinations: [
         {
           region: "ap-northeast-1",
           bucket: "fides-test-secondary",
@@ -42,14 +48,38 @@ function App() {
         },
         {
           region: "ap-northeast-1",
-          bucket: "fides-access-test",
+          bucket: "fides-access-test1",
           fileName: "key2"
         }
       ],
-      key
+      key: encKey
     })
     console.log("successfully create")
-    },[wallet, key])
+    console.log(entropy)
+  }, [wallet, encKey])
+
+  const handleRecoverWithPassword = useCallback(async () => {
+    if (!wallet) throw "no wallet";
+    if (!encKey) throw "no key";
+    const entropy = await wallet.getEntoropyFromRemote({
+      destinations: [
+        {
+          region: "ap-northeast-1",
+          bucket: "fides-test-secondary",
+          fileName: "key1"
+        },
+        {
+          region: "ap-northeast-1",
+          bucket: "fides-access-test1",
+          fileName: "key2"
+        }
+      ],
+      key: decKey
+    })
+    console.log(entropy)
+  }, [wallet, decKey])
+
+
   return (
     <div className="App">
       <header className="App-header">
@@ -59,8 +89,12 @@ function App() {
               <button onClick={handleSignOut}>logout</button>
             </div>
             <div>
-              <input type="text" onChange={handleChangeKey} value={key}/>
+              <input type="text" onChange={handleChangeEncKey} value={encKey}/>
               <button onClick={handleCreateWithPassword}>create with password</button>
+            </div>
+            <div>
+              <input type="text" onChange={handleChangDecKey} value={decKey}/>
+              <button onClick={handleRecoverWithPassword}>recover with password</button>
             </div>
           </div>
         )}

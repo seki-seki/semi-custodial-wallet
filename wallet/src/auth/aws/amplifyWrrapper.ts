@@ -23,6 +23,8 @@ export class AmplifyWrrapper {
   async getSession() {
     return await fetchAuthSession();
   }
+
+  @synchronized
   async upload(region: string, bucket: string, fileName: string, body: string) {
     const defaultConfig = Amplify.getConfig();
     const session = await this.getSession();
@@ -37,10 +39,12 @@ export class AmplifyWrrapper {
     })
     const result = await uploadData({
       path: `users/${session.userSub}/${fileName}`,
-      data: body
+      data: body,
     }).result
+    return result;
   }
 
+  @synchronized
   async get(region: string, bucket: string, fileName: string) {
     const defaultConfig = Amplify.getConfig();
     const session = await this.getSession();
@@ -54,9 +58,31 @@ export class AmplifyWrrapper {
       }
     })
     const result = await downloadData({
-      path: fileName
+      path: `users/${session.userSub}/${fileName}`
     }).result
     const body = await result.body.text();
     return body;
   }
+}
+
+function synchronized(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  const originalMethod = descriptor.value;
+  let isLocked = false;
+
+  descriptor.value = async function(...args: any[]) {
+    if (isLocked) {
+      while (isLocked) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
+    isLocked = true;
+    try {
+      const result = await originalMethod.apply(this, args);
+      return result;
+    } finally {
+      isLocked = false;
+    }
+  };
+
+  return descriptor;
 }
