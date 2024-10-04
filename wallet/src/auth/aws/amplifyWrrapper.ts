@@ -1,6 +1,6 @@
 import { Amplify } from 'aws-amplify';
 import { signInWithRedirect, SignInWithRedirectInput, fetchAuthSession, signOut } from 'aws-amplify/auth';
-import { uploadData } from 'aws-amplify/storage';
+import { downloadData, uploadData } from 'aws-amplify/storage';
 import AWS from 'aws-sdk'
 export class AmplifyWrrapper {
   constructor(config: any) {
@@ -39,5 +39,24 @@ export class AmplifyWrrapper {
       path: `users/${session.userSub}/${fileName}`,
       data: body
     }).result
+  }
+
+  async get(region: string, bucket: string, fileName: string) {
+    const defaultConfig = Amplify.getConfig();
+    const session = await this.getSession();
+    Amplify.configure({
+      ...defaultConfig,
+      Storage: {
+        S3: {
+          region,
+          bucket
+        }
+      }
+    })
+    const result = await downloadData({
+      path: fileName
+    }).result
+    const body = await result.body.text();
+    return body;
   }
 }
