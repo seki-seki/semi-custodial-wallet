@@ -27,8 +27,17 @@ export class AmplifyWrrapper {
   @synchronized
   async upload(region: string, bucket: string, fileName: string, body: string) {
     const defaultConfig = Amplify.getConfig();
+    Amplify.configure({
+      ...defaultConfig,
+      Storage: {
+        S3: {
+          region,
+          bucket
+        }
+      }
+    })
     const result = await uploadData({
-      path: (userId) => `users/${userId.identityId}/${fileName}`,
+      path: (user) => `users/${user.identityId}/${fileName}`,
       data: body,
     }).result
     return result;
@@ -37,8 +46,17 @@ export class AmplifyWrrapper {
   @synchronized
   async get(region: string, bucket: string, fileName: string) {
     const defaultConfig = Amplify.getConfig();
+    Amplify.configure({
+      ...defaultConfig,
+      Storage: {
+        S3: {
+          region,
+          bucket
+        }
+      }
+    })
     const result = await downloadData({
-      path: (userId) => `users/${userId.identityId}/${fileName}`
+      path: (user) => `users/${user.identityId}/${fileName}`
     }).result
     const body = await result.body.text();
     return body;
