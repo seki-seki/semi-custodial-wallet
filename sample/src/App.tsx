@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import { SemiCustodialWallet } from "semi-custodial-wallet";
 import config from "./aws-exports";
+import { ethers } from 'ethers';
 
 function App() {
   const [wallet, setWallet] = useState<SemiCustodialWallet>()
@@ -10,6 +11,7 @@ function App() {
   const [encKey, setEncKey] = useState<string>("");
   const [decKey, setDecKey] = useState<string>("");
   const [passkey, setPasskey] = useState<string>();
+  const [entropy, setEntropy] = useState<string>();
 
   useEffect(() => {
     const setup = async () => {
@@ -127,6 +129,7 @@ function App() {
     })
     console.log("successfully create")
     console.log(entropy)
+    setEntropy(entropy);
   }, [wallet, encKey])
 
   const handleCreateWithPasskey = useCallback(async () => {
@@ -149,6 +152,7 @@ function App() {
     })
     console.log("successfully create")
     console.log(entropy)
+    setEntropy(entropy);
   }, [wallet, passkey])
 
   const handleRecoverWithPassword = useCallback(async () => {
@@ -176,6 +180,7 @@ function App() {
     })
     console.log("recover from local")
     console.log(fromLocal)
+    setEntropy(entropy);
   }, [wallet, decKey])
 
   const handleRecoverWithPasskey = useCallback(async () => {
@@ -204,7 +209,17 @@ function App() {
     })
     console.log("recover from local")
     console.log(fromLocal)
+    setEntropy(entropy);
   }, [wallet, passkey])
+
+  const handleCreateEthereumWallet = useCallback(async () => {
+    if(!wallet) throw "no wallet"
+    if(!entropy) throw "no entropy"
+    const mnemonic = wallet.getMnemonicFromEntropy(entropy);
+    const etherWallet = ethers.Wallet.fromPhrase(mnemonic);
+    console.log("successfully create wallet")
+    console.log(await etherWallet.getAddress())
+  },[wallet, entropy])
 
   return (
     <div className="App">
@@ -238,6 +253,9 @@ function App() {
               <div>
                 <button onClick={handleRecoverWithPasskey}>recover with passkey</button>
               </div>
+            </div>)}
+            {entropy && (<div>
+              <button onClick={handleCreateEthereumWallet}>create etherum wallet</button>
             </div>)}
           </div>
         )}

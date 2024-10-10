@@ -81,4 +81,8 @@ export class SemiCustodialWallet {
     if (!encEntropy) throw "not found"
     return encryptor.decryptWithLastIv(encEntropy, key);
   }
+
+  getMnemonicFromEntropy(entropy: string) {
+    return bip32.entropyToMnemonic(entropy);
+  }
 }
