@@ -76,6 +76,8 @@ function App() {
       },
     });
     // @ts-ignore
+    if(!credential.getClientExtensionResults().prf.enabled) throw "please select prf enabled authentificator"
+    // @ts-ignore
     setPasskey(arrayBufferToBase64(credential.getClientExtensionResults().prf.results.first))
     // @ts-ignore
     localStorage.setItem("passkey.rawId", arrayBufferToBase64(credential.rawId));
@@ -107,6 +109,8 @@ function App() {
         },
       },
     });
+    // @ts-ignore
+    if(!credential.getClientExtensionResults().prf.enabled) throw "please select prf enabled authentificator"
     // @ts-ignore
     setPasskey(arrayBufferToBase64(credential.getClientExtensionResults().prf.results.first))
   }, [passkey])
