@@ -67,6 +67,7 @@ function App() {
         extensions: {
           // @ts-ignore
           prf: {
+            enabled: true,
             eval: {
               first: firstSalt,
             },
@@ -98,6 +99,7 @@ function App() {
         extensions: {
           // @ts-ignore
           prf: {
+            enabled: true,
             eval: {
               first: firstSalt,
             },
